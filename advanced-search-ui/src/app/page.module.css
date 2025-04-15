@@ -6,14 +6,33 @@
   --button-primary-hover: #383838;
   --button-secondary-hover: #f2f2f2;
 
-  display: grid;
-  grid-template-rows: 20px 1fr 20px;
+  display: flex;
   align-items: center;
-  justify-items: center;
-  min-height: 100svh;
-  padding: 80px;
-  gap: 64px;
+  justify-content: center;
+  flex-direction: column;
+
   font-family: var(--font-geist-sans);
+  font-size: 14px;
+
+  input {
+    margin-left: 10px;
+    font-size: 12px;
+  }
+}
+
+/* 样式 */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loadingSpin {
+  border: 3px solid #f3f3f3; /* 背景色 */
+  border-top: 3px solid #3498db; /* 动画颜色 */
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -30,8 +49,27 @@
 .main {
   display: flex;
   flex-direction: column;
-  gap: 32px;
-  grid-row-start: 2;
+  gap: 6px;
+  /* grid-row-start: 2; */
+  min-height: 85svh;
+}
+
+@media (min-height: 320px) {
+  .main {
+    min-height: 90svh;
+  }
+}
+
+@media (min-height: 480px) {
+  .main {
+    min-height: 92svh;
+  }
+}
+
+@media (min-height: 720px) {
+  .main {
+    min-height: 92svh;
+  }
 }
 
 .main ol {
@@ -56,31 +94,6 @@
   font-weight: 600;
 }
 
-.ctas {
-  display: flex;
-  gap: 16px;
-}
-
-.ctas a {
-  appearance: none;
-  border-radius: 128px;
-  height: 48px;
-  padding: 0 20px;
-  border: none;
-  border: 1px solid transparent;
-  transition:
-    background 0.2s,
-    color 0.2s,
-    border-color 0.2s;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  line-height: 20px;
-  font-weight: 500;
-}
-
 a.primary {
   background: var(--foreground);
   color: var(--background);
@@ -90,22 +103,6 @@ a.primary {
 a.secondary {
   border-color: var(--gray-alpha-200);
   min-width: 158px;
-}
-
-.footer {
-  grid-row-start: 3;
-  display: flex;
-  gap: 24px;
-}
-
-.footer a {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.footer img {
-  flex-shrink: 0;
 }
 
 /* Enable hover only on non-touch devices */
@@ -138,16 +135,6 @@ a.secondary {
 
   .main ol {
     text-align: center;
-  }
-
-  .ctas {
-    flex-direction: column;
-  }
-
-  .ctas a {
-    font-size: 14px;
-    height: 40px;
-    padding: 0 16px;
   }
 
   a.secondary {
