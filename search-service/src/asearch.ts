@@ -120,6 +120,7 @@ interface SearchParams {
 interface ResultRecord {
   lineNumber: number;
   line: string;
+  // lines: string[];
   filePath: string;
 }
 
@@ -179,8 +180,12 @@ async function search(params: SearchParams): Promise<{
 
 // 主程序入口
 async function main(): Promise<void> {
-  // node myfind.js "/Users/jasonchen/src/yuanbao/chatbot-web/apps/yuanbao-desktop" "main_mod" "AllAgentPage" 5
+  // node myfind.js "/your/project/path" "main_mod" "AllAgentPage" 5
   const args: string[] = process.argv.slice(2);
+  // console.log('asearch::main', args.length);
+  if (args.length === 0) {
+    return;
+  }
   const params: SearchParams = {
     // 项目目录路径
     projdir: args[0],
