@@ -203,4 +203,4 @@ async function main(): Promise<void> {
 
 void main();
 
-export { search };
+export { search, SearchParams, ResultRecord };

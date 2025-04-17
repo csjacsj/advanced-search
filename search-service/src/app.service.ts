@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { search, SearchParams, ResultRecord } from './asearch';
 
 @Injectable()
 export class AppService {
@@ -6,8 +7,10 @@ export class AppService {
     return 'Hello World!';
   }
 
-  search(params: any): any {
-    // Example: Process the search parameters
-    return { result: `Search results for: ${JSON.stringify(params)}` };
+  async search(
+    params: SearchParams,
+  ): Promise<{ result_record_list: ResultRecord[] }> {
+    const { result_record_list } = await search(params);
+    return { result_record_list };
   }
 }

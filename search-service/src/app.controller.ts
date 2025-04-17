@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Body } from '@nestjs/common';
 import { AppService } from './app.service';
+import { SearchParams, ResultRecord } from './asearch';
 
 @Controller()
 export class AppController {
@@ -11,7 +12,22 @@ export class AppController {
   }
 
   @Post('search')
-  search(@Body() params: any): any {
-    return this.appService.search(params);
+  async search(@Body() params: SearchParams): Promise<{
+    code: number;
+    result_record_list: ResultRecord[];
+  }> {
+    try {
+      const { result_record_list } = await this.appService.search(params);
+      return {
+        code: 0,
+        result_record_list,
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        code: 2,
+        result_record_list: [],
+      };
+    }
   }
 }
