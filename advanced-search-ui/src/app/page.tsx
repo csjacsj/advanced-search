@@ -12,7 +12,7 @@ export default function Home() {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-        <div>Project path:<input id='projdir_input' style={{ minWidth: 480 }}></input></div>
+        <div>Project path:<input id='projdir_input' autoComplete="asearch-projdir" style={{ minWidth: 480 }}></input></div>
         <div>Main search:
           <input id='findstr_input' style={{ minWidth: 130 }}></input>
           <span style={{ marginLeft: 12 }}></span>
@@ -30,21 +30,24 @@ export default function Home() {
           <SearchButton setResults={setResults} setProjectDir={setProjectDir}/>
           <div className={styles.loadingSpin} style={{ display: "inline-block", marginLeft: 4, marginTop: 0, verticalAlign: 'bottom' }}></div>
         </div>
+        <div style={ {width: '100%', height: 1, backgroundColor: 'lightgray', marginTop: 4} }></div>
         <div>
-          {results.map((result, i) => (
-            <div key={i}>
+        {results.map((result, i) => (
+            <div key={i} style={{ marginTop: '16px' }}>
               <div>
                 {result.filePath.startsWith(projectDir) ? (
                   <>
                     <span style={{ color: 'gray' }}>[Project path]</span>
                     {result.filePath.substring(projectDir.length)}
                   </>
-                ) : (
-                  result.filePath
-                )}
+                ) : (<>
+                  {result.filePath}
+                  </>)}
               </div>
               <div>:{result.lineNumber}</div>
-              <div>{result.line}</div>
+              <div>{result.lines.map((lineInfo, index) => (
+                <div key={index}>{lineInfo.line}</div>
+          ))}</div>
             </div>
           ))}
         </div>

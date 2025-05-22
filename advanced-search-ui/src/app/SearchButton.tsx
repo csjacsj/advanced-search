@@ -1,9 +1,15 @@
 'use client';
 import axios from "axios";
 
+interface LinesInfo {
+  lineNumber: number;
+  line: string;
+}
+
 export interface ResultRecord {
   lineNumber: number;
   line: string;
+  lines: LinesInfo[];
   filePath: string;
 }
 
@@ -27,9 +33,12 @@ export default function SearchButton(props: {
 
     props.setProjectDir(projdir);
 
+    // const apiHost = '';
+    const apiHost = 'http://localhost:3000';
+
     let ret;
     try {
-      ret = await axios.post('/search', {
+      ret = await axios.post(apiHost + '/search', {
         projdir,
         findstr,
         sidestr,

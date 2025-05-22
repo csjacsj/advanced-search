@@ -2,6 +2,12 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as readline from 'readline';
 
+// 定义 LinesInfo 类型
+interface LinesInfo {
+  lineNumber: number;
+  line: string;
+}
+
 // 递归读取目录
 function walkDir(dir: string): string[] {
   const files: string[] = fs.readdirSync(dir);
@@ -34,13 +40,17 @@ function searchFile(
   sidestr2?: string,
   sidestr3?: string,
   sidestr4?: string,
-): Promise<Array<{ lineNumber: number; line: string }>> {
+): Promise<Array<{ lineNumber: number; line: string; lines: LinesInfo[] }>> {
   const rl: readline.Interface = readline.createInterface({
     input: fs.createReadStream(filePath),
     crlfDelay: Infinity,
   });
 
-  const matches: Array<{ lineNumber: number; line: string }> = [];
+  const matches: Array<{
+    lineNumber: number;
+    line: string;
+    lines: LinesInfo[];
+  }> = [];
   const lines: string[] = [];
 
   let lineNumber: number = 0; // 跟踪行号
@@ -48,12 +58,21 @@ function searchFile(
     lineNumber++;
     lines.push(line);
     if (line.includes(findstr)) {
-      matches.push({ lineNumber, line });
+      matches.push({ lineNumber, line, lines: [] });
     }
   });
 
   return new Promise((resolve) => {
     rl.on('close', () => {
+      // 为每个匹配的行生成上下文行
+      matches.forEach((match) => {
+        const startLine = Math.max(1, match.lineNumber - 5);
+        const endLine = Math.min(lines.length, match.lineNumber + 5);
+        for (let i = startLine; i <= endLine; i++) {
+          match.lines.push({ lineNumber: i, line: lines[i - 1] });
+        }
+      });
+
       // 确认匹配的行是否在指定范围内出现了伴随字符串
       const filteredMatches = matches.filter((match) => {
         const lineNumber = match.lineNumber;
@@ -120,7 +139,7 @@ interface SearchParams {
 interface ResultRecord {
   lineNumber: number;
   line: string;
-  // lines: string[];
+  lines: LinesInfo[];
   filePath: string;
 }
 
@@ -133,7 +152,7 @@ async function search(params: SearchParams): Promise<{
   const files: string[] = walkDir(projdir);
   const allMatches: Array<{
     file: string;
-    matches: Array<{ lineNumber: number; line: string }>;
+    matches: Array<{ lineNumber: number; line: string; lines: LinesInfo[] }>;
   }> = [];
   const output: string[] = [];
   const resultRecords: ResultRecord[] = [];
@@ -154,6 +173,7 @@ async function search(params: SearchParams): Promise<{
         resultRecords.push({
           lineNumber: match.lineNumber,
           line: match.line,
+          lines: match.lines,
           filePath: file,
         });
       });
@@ -166,6 +186,20 @@ async function search(params: SearchParams): Promise<{
       output.push(`文件: ${file}`);
       matches.forEach((match) => {
         output.push(`  行号: ${match.lineNumber}, 内容: ${match.line}`);
+        const record = resultRecords.find(
+          (r) => r.lineNumber === match.lineNumber && r.filePath === file,
+        );
+        if (record) {
+          let maxLen = 1;
+          record.lines.forEach((linesInfo) => {
+            if (linesInfo.lineNumber.toString().length > maxLen) {
+              maxLen = linesInfo.lineNumber.toString().length;
+            }
+          });
+          output.push(
+            `  上下文内容: \n${record.lines.map((linesInfo) => `${linesInfo.lineNumber}:\t${linesInfo.line}`).join('\n')}\n`,
+          );
+        }
       });
     });
   } else {
